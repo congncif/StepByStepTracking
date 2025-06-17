@@ -1,0 +1,20 @@
+PODS:
+  - StepByStepTracking (0.1.0):
+    - StepByStepTracking/Default (= 0.1.0)
+  - StepByStepTracking/Core (0.1.0)
+  - StepByStepTracking/Default (0.1.0):
+    - StepByStepTracking/Core
+
+DEPENDENCIES:
+  - StepByStepTracking (from `../`)
+
+EXTERNAL SOURCES:
+  StepByStepTracking:
+    :path: "../"
+
+SPEC CHECKSUMS:
+  StepByStepTracking: b1bfd2905a621a2d5787249892165b33351dca60
+
+PODFILE CHECKSUM: 61352946c4bfe0735e7e52bd910ae6b319a2e9c6
+
+COCOAPODS: 1.16.2
