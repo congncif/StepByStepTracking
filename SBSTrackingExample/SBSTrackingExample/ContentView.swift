@@ -9,7 +9,7 @@ import StepByStepTracking
 import SwiftUI
 
 struct ContentView: View {
-    @Environment(\.tracker) var tracker: StepByStepTracker
+    @Environment(\.tracker) var tracker: TrackingService
     @State private var path = [Int]()
 
     var body: some View {
@@ -21,16 +21,14 @@ struct ContentView: View {
                 Text("Hello, world!")
 
                 Button("Send event") {
-                    Task {
-                        await tracker.sendEvent(.events(.event1), properties: [
-                            .property(.properties(.property1), "home1"),
-                            .property(.properties(.property2), "home2")
-                        ])
-                    }
+                    tracker.sendEvent(.events(.event1), properties: [
+                        .property(.properties(.property1), "home1"),
+                        .property(.properties(.property2), "home2")
+                    ])
                 }
 
                 Button("Next") {
-                    path.append(Int.random(in: 1...100))
+                    path.append(Int.random(in: 1 ... 100))
                 }
             }
             .padding()
@@ -39,18 +37,16 @@ struct ContentView: View {
                 NextView(selection: selection)
             }
             .onAppear {
-                Task {
-                    await tracker.onStep(.steps(.step2), properties: [
-                        .property(.properties(.userID), "SAMPLE_USER_ID")
-                    ])
-                }
+                tracker.onStep(.steps(.step2), properties: [
+                    .property(.properties(.userID), "SAMPLE_USER_ID")
+                ])
             }
         }
     }
 }
 
 struct NextView: View {
-    @Environment(\.tracker) var tracker: StepByStepTracker
+    @Environment(\.tracker) var tracker: TrackingService
 
     let selection: Int
 
@@ -59,19 +55,15 @@ struct NextView: View {
             Text("You selected \(selection)")
 
             Button("Send event") {
-                Task {
-                    await tracker.sendEvent(.events(.event2), properties: [
-                        .property(.properties(.property2), "selection screen")
-                    ])
-                }
+                tracker.sendEvent(.events(.event2), properties: [
+                    .property(.properties(.property2), "selection screen")
+                ])
             }
         }
         .onAppear {
-            Task {
-                await tracker.onStep(.steps(.step1), properties: [
-                    .property(.properties(.selectionID), selection)
-                ])
-            }
+            tracker.onStep(.steps(.step1), properties: [
+                .property(.properties(.selectionID), selection)
+            ])
         }
     }
 }

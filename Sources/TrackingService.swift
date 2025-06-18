@@ -14,14 +14,54 @@ public protocol TrackingService {
     func sendEvent(_ parameters: any EncodableParameters) async
 }
 
+public extension TrackingService {
+    func setProperties(_ parameters: any EncodableParameters) {
+        Task.detached {
+            await setProperties(parameters)
+        }
+    }
+
+    func onStep(_ parameters: any EncodableParameters) {
+        Task.detached {
+            await onStep(parameters)
+        }
+    }
+
+    func exitStep(_ id: String) {
+        Task.detached {
+            await exitStep(id)
+        }
+    }
+
+    func sendEvent(_ parameters: any EncodableParameters) {
+        Task.detached {
+            await sendEvent(parameters)
+        }
+    }
+}
+
 public protocol DeferredTrackingService: TrackingService {
     func setDeferredProperties(_ properties: [any EncodableParameters]) async
     func sendDeferredEvent(_ event: any EncodableParameters, byPropertiesID propertiesID: String) async
 }
 
 public extension DeferredTrackingService {
-    func clearDeferredProperties() async {
-        await setDeferredProperties([])
+    func clearDeferredProperties() {
+        Task.detached {
+            await setDeferredProperties([])
+        }
+    }
+
+    func setDeferredProperties(_ properties: [any EncodableParameters]) {
+        Task.detached {
+            await setDeferredProperties(properties)
+        }
+    }
+
+    func sendDeferredEvent(_ event: any EncodableParameters, byPropertiesID propertiesID: String) {
+        Task.detached {
+            await sendDeferredEvent(event, byPropertiesID: propertiesID)
+        }
     }
 }
 
@@ -40,18 +80,18 @@ public protocol EncodableParameters {
     func encode() -> [String: Any]
 }
 
-struct TrackingElement: EncodableParameters {
-    init(_ identifier: TrackingID, properties: [TrackingProperty] = []) {
+public struct TrackingElement: EncodableParameters {
+    public init(_ identifier: TrackingID, properties: [TrackingProperty] = []) {
         self.identifier = identifier
         self.properties = properties
     }
 
-    let identifier: TrackingID
-    let properties: [TrackingProperty]
+    public let identifier: TrackingID
+    public let properties: [TrackingProperty]
 
-    var id: String { identifier.name }
+    public var id: String { identifier.name }
 
-    func encode() -> [String: Any] {
+    public func encode() -> [String: Any] {
         properties.reduce([:]) { partialResult, item in
             if let value = item.value {
                 partialResult.merging([item.key: value], uniquingKeysWith: { $1 })
@@ -91,25 +131,33 @@ public extension TrackingProperty {
 }
 
 public extension TrackingService {
-    func setProperties(_ id: TrackingID, value: Any?) async {
-        let element = TrackingElement(id, properties: [TrackingProperty(key: id.name, value: value)])
-        await setProperties(element)
+    func setProperties(_ id: TrackingID, value: Any?) {
+        Task.detached {
+            let element = TrackingElement(id, properties: [TrackingProperty(key: id.name, value: value)])
+            await setProperties(element)
+        }
     }
 
-    func onStep(_ id: TrackingID, properties: [TrackingProperty] = []) async {
-        let element = TrackingElement(id, properties: properties)
-        await onStep(element)
+    func onStep(_ id: TrackingID, properties: [TrackingProperty] = []) {
+        Task.detached {
+            let element = TrackingElement(id, properties: properties)
+            await onStep(element)
+        }
     }
 
-    func sendEvent(_ id: TrackingID, properties: [TrackingProperty] = []) async {
-        let element = TrackingElement(id, properties: properties)
-        await sendEvent(element)
+    func sendEvent(_ id: TrackingID, properties: [TrackingProperty] = []) {
+        Task.detached {
+            let element = TrackingElement(id, properties: properties)
+            await sendEvent(element)
+        }
     }
 }
 
 public extension DeferredTrackingService {
-    func sendDeferredEvent(_ id: TrackingID, byPropertiesID propertiesID: String, withCustomProperties properties: [TrackingProperty] = []) async {
-        let element = TrackingElement(id, properties: properties)
-        await sendDeferredEvent(element, byPropertiesID: propertiesID)
+    func sendDeferredEvent(_ id: TrackingID, byPropertiesID propertiesID: String, withCustomProperties properties: [TrackingProperty] = []) {
+        Task.detached {
+            let element = TrackingElement(id, properties: properties)
+            await sendDeferredEvent(element, byPropertiesID: propertiesID)
+        }
     }
 }

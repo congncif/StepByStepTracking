@@ -9,11 +9,11 @@ import StepByStepTracking
 import SwiftUI
 
 private struct SBSTrackingKey: EnvironmentKey {
-    static let defaultValue: StepByStepTracker = .init(externalTracker: ConsoleTracker())
+    static let defaultValue: TrackingService = StepByStepTracker(externalTracker: ConsoleTracker())
 }
 
 extension EnvironmentValues {
-    var tracker: StepByStepTracker {
+    var tracker: TrackingService {
         get { self[SBSTrackingKey.self] }
         set { self[SBSTrackingKey.self] = newValue }
     }
@@ -21,7 +21,7 @@ extension EnvironmentValues {
 
 @main
 struct SBSTrackingExampleApp: App {
-    let tracker = SBSTrackingKey.defaultValue
+    let tracker: TrackingService = SBSTrackingKey.defaultValue
 
     var body: some Scene {
         WindowGroup {
