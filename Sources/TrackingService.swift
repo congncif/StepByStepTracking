@@ -120,6 +120,12 @@ public struct TrackingProperty {
         self.value = value
     }
 
+    public init(key: String, json: (some Encodable)?, encoder: JSONEncoder = JSONEncoder.snakeCase) {
+        self.key = key
+        let encodedValue = try? json?.toDictionary(encoder: encoder)
+        value = encodedValue
+    }
+
     public let key: String
     public let value: Any?
 }
@@ -134,6 +140,13 @@ public extension TrackingService {
     func setProperties(_ id: TrackingID, value: Any?) {
         Task.detached {
             let element = TrackingElement(id, properties: [TrackingProperty(key: id.name, value: value)])
+            await setProperties(element)
+        }
+    }
+
+    func setProperties(_ id: TrackingID, properties: [TrackingProperty] = []) {
+        Task.detached {
+            let element = TrackingElement(id, properties: properties)
             await setProperties(element)
         }
     }
@@ -159,5 +172,27 @@ public extension DeferredTrackingService {
             let element = TrackingElement(id, properties: properties)
             await sendDeferredEvent(element, byPropertiesID: propertiesID)
         }
+    }
+}
+
+extension Encodable {
+    func toDictionary(encoder: JSONEncoder = JSONEncoder.snakeCase) throws -> [String: Any] {
+        let data = try encoder.encode(self)
+        let object = try JSONSerialization.jsonObject(with: data, options: [])
+
+        guard let dictionary = object as? [String: Any] else {
+            throw NSError(domain: "EncodingError", code: -1, userInfo: [NSLocalizedDescriptionKey: "Failed to convert data to dictionary"])
+        }
+
+        return dictionary
+    }
+}
+
+extension JSONEncoder {
+    @usableFromInline
+    static var snakeCase: JSONEncoder {
+        let coder = JSONEncoder()
+        coder.keyEncodingStrategy = .convertToSnakeCase
+        return coder
     }
 }
