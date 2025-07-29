@@ -134,6 +134,10 @@ public extension TrackingProperty {
     static func property(_ id: TrackingID, _ value: Any?) -> TrackingProperty {
         TrackingProperty(key: id.name, value: value)
     }
+
+    static func property(_ id: TrackingID, json: (some Encodable)?, encoder: JSONEncoder = JSONEncoder.snakeCase) -> TrackingProperty {
+        TrackingProperty(key: id.name, json: json, encoder: encoder)
+    }
 }
 
 public extension TrackingService {

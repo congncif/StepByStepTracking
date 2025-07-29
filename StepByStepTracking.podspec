@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name = "StepByStepTracking"
-  s.version = "0.2.1"
+  s.version = "0.2.2"
   s.swift_versions = "5"
   s.summary = "[StepTracking] Track code behavior follow step by step."
 
